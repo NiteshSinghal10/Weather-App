@@ -38,7 +38,7 @@ function renderUI(information){
     clouds.innerHTML=information.clouds.all +"%";
     weatherdiscription.innerHTML=information.weather?.[0].description;
     weatherImg.setAttribute("src",`https://openweathermap.org/img/w/${information.weather?.[0].icon}.png`)
-    temperature.innerHTML=information.main.temp + " 'C";
+    temperature.innerHTML=(eval(("273.15"+information.main.temp)))+ " 'C";
 }
 
 
