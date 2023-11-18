@@ -61,6 +61,8 @@ async function infoByCity(cityName)
     }
 }
 
+
+
 async function infoByCoordinates(yourCoordinates){
 let lat=yourCoordinates.coords.latitude;
 let long=yourCoordinates.coords.longitude;
@@ -91,6 +93,7 @@ function yourLocation(){
     }
 }
 
+//tab ko switch krne ke liye
 function switchTab(clickedTab){
     if(currentTab !== clickedTab)
     {
@@ -100,6 +103,9 @@ function switchTab(clickedTab){
 
         if(clickedTab===yourweather)
         {
+            if(error.classList.contains("active"))
+                error.classList.remove("active")
+            
             if(searchBar.classList.contains("active"))
                 searchBar.classList.remove("active");
 
