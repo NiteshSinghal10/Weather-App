@@ -1,5 +1,5 @@
 .active{
-    display:block;
+    display:block !important;
 }
 
 .line{
