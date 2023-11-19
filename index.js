@@ -45,52 +45,78 @@ function renderUI(information){
 
 async function infoByCity(cityName)
 {
-    try{
-        let result=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_Key}`)
-        
-        let data=await result.json()
-        data=JSON.stringify(data)
-
+        cityName=cityName.trim();
         if(error.classList.contains("active"))
             error.classList.remove("active")
 
-        renderUI(data);
-    }
-    catch(err){
-        weatherclass.classList.remove("active")
-        error.classList.add("active")
-    }
+        if(weatherclass.classList.contains("active"))
+                weatherclass.classList.remove("active")
+
+        loading.classList.add("active")
+        
+        let result=fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_Key}`)
+        result.then(async()=>{
+            try{
+                let data=await (await result).json()
+                data=JSON.stringify(data)
+                renderUI(data);
+            }
+            catch(err){
+                if(weatherclass.classList.contains("active"))
+                    weatherclass.classList.remove("active")
+
+                error.classList.add("active")
+            }
+        })
+        result.catch(()=>{
+            error.classList.add("active")
+        })
+        result.finally(()=>{
+            if(loading.classList.contains("active"))
+                loading.classList.remove("active")
+        })        
 }
 
 
 
-async function infoByCoordinates(yourCoordinates){
-let lat=yourCoordinates.coords.latitude;
-let long=yourCoordinates.coords.longitude;
-
-let obj={
-    "coords":{
-        "latitude":lat,
-        "longitude":long
-}
-}
-obj=JSON.stringify(obj);
-sessionStorage.setItem("user-location",obj);
-
-let result=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${API_Key}`)
-let data=await result.json()
-data=JSON.stringify(data)
+async function infoByCoordinates(lati,longi){
 
 if(grantAccess.classList.contains("active"))
     grantAccess.classList.remove("active")
 
-renderUI(data);
+loading.classList.add("active")
+
+let result=fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lati}&lon=${longi}&appid=${API_Key}`)
+
+result.then(async ()=>{
+    let data=await (await result).json()
+    data=JSON.stringify(data)
+    renderUI(data);
+})
+result.catch(()=>{
+    error.classList.add("active");
+})
+result.finally(()=>{
+    if(loading.classList.contains("active"))
+        loading.classList.remove("active")
+})
 }
 
 function yourLocation(){
     if(navigator.geolocation)
     {
-        navigator.geolocation.getCurrentPosition(infoByCoordinates);
+        navigator.geolocation.getCurrentPosition((yourCoordinates)=>{
+            let lat=yourCoordinates.coords.latitude;
+            let long=yourCoordinates.coords.longitude;
+            
+            let obj={
+                    "latitude":lat,
+                    "longitude":long
+            }
+            obj=JSON.stringify(obj);
+            sessionStorage.setItem("user-location",obj);
+            infoByCoordinates(lat,long)
+        });
     }
 }
 
@@ -106,15 +132,19 @@ function switchTab(clickedTab){
         {
             if(error.classList.contains("active"))
                 error.classList.remove("active")
-            
+
             if(searchBar.classList.contains("active"))
                 searchBar.classList.remove("active");
+
+            if(weatherclass.classList.contains("active"))
+                weatherclass.classList.remove("active");
 
             if(sessionStorage.getItem("user-location"))
             {
                 grantAccess.classList.remove("active")
                 let coordinates=sessionStorage.getItem("user-location")
-                infoByCoordinates(JSON.parse(coordinates));
+                coordinates=JSON.parse(coordinates)
+                infoByCoordinates(coordinates.latitude,coordinates.longitude);
             }
             else{
                 grantAccess.classList.add("active");
@@ -122,12 +152,16 @@ function switchTab(clickedTab){
         }
         else if(currentTab===searchweather)
         {
+            searchBar.classList.add("active");
+
             if(grantAccess.classList.contains("active"))
-                grantAccess.classList.remove("active");
+                grantAccess.classList.remove("active"); 
+
             if(weatherclass.classList.contains("active"))
                 weatherclass.classList.remove("active");
 
-            searchBar.classList.add("active");
+            if(city.value)
+                infoByCity( city.value)
         }
     }
 }
@@ -143,6 +177,6 @@ searchweather.addEventListener("click",(e)=>{
     switchTab(e.target)
 })
 searchBtn.addEventListener("click",()=>{
-    infoByCity(city.value)
+    infoByCity( city.value)
 })
 locationBtn.addEventListener("click",yourLocation)
