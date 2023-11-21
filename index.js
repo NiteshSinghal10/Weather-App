@@ -168,7 +168,6 @@ function switchTab(clickedTab){
 
 
 
-
 yourweather.addEventListener("click",(e)=>{
     switchTab(e.target)
 })
@@ -180,3 +179,7 @@ searchBtn.addEventListener("click",()=>{
     infoByCity( city.value)
 })
 locationBtn.addEventListener("click",yourLocation)
+city.addEventListener("keydown",(key)=>{
+    if(key.code==="Enter")
+        infoByCity( city.value)
+})
