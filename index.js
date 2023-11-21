@@ -180,7 +180,6 @@ searchBtn.addEventListener("click",()=>{
 })
 locationBtn.addEventListener("click",yourLocation)
 city.addEventListener("keydown",(key)=>{
-    city.value=key.code;
-    if(key.code==="Enter" || key.code=="SEARCH")
+    if(key.code==="Enter" || key.code=="Search")
         infoByCity( city.value)
 })
